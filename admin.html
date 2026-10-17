@@ -189,9 +189,8 @@ const avatarHtml = u => u?.user_metadata?.avatar_url
     <div class="tabs"><button id="tcFile" class="on" onclick="srcMode('cover','file')">من الجهاز</button><button id="tcLink" onclick="srcMode('cover','link')">رابط</button></div>
     <input id="cover" type="file" accept="image/*"><input id="coverLink" class="hide" placeholder="https://...">
     <p id="hint" class="mut hide">اترك الملف أو الغلاف فارغًا للإبقاء على الحالي.</p>
-    <p id="msg" class="err"></p>
   </div>
-  <div class="df"><button id="addBtn" onclick="saveBook()">إضافة</button><button class="g" onclick="dlg.close()">إلغاء</button></div>
+  <div class="df"><button id="addBtn" onclick="saveBook()">إضافة</button><button class="g" onclick="dlg.close()">إلغاء</button><p id="msg" class="err" style="margin:0;align-self:center;flex:1;font-size:13px"></p></div>
 </dialog>
 <div id="toast"></div>
 <footer>جميع الحقوق محفوظة © للمطور <b>محمد رمضان الحرباوي</b></footer>
@@ -349,11 +348,28 @@ const exportEvents = () => csv("activity", [["الوقت","المستخدم","ا
   ...events.map(e => [e.created_at, uname(e.user_id), bname(e.book_id), e.kind])]);
 
 /* ---------- إضافة / تعديل / حذف ---------- */
-async function upload(f, folder) {
-  const path = `${folder}/${Date.now()}-${f.name.replace(/[^\w.\-]/g, "_")}`;
-  const { error } = await sb.storage.from(BUCKET).upload(path, f);
-  if (error) throw error;
-  return { path, url: sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl };
+function upload(f, folder, label) {
+  return new Promise(async (res, rej) => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return rej(new Error("انتهت الجلسة، سجّل الدخول من جديد"));
+    const path = `${folder}/${Date.now()}-${f.name.replace(/[^\w.\-]/g, "_")}`;
+    const x = new XMLHttpRequest();
+    x.open("POST", `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`);
+    x.setRequestHeader("Authorization", "Bearer " + session.access_token);
+    x.setRequestHeader("apikey", SUPABASE_KEY);
+    x.setRequestHeader("x-upsert", "false");
+    x.setRequestHeader("Content-Type", f.type || "application/octet-stream");
+    x.timeout = 900000;
+    x.upload.onprogress = e => { if (e.lengthComputable) { $("msg").className = "mut"; $("msg").textContent = `جارٍ رفع ${label}: ${Math.round(e.loaded / e.total * 100)}% (${fmtSize(e.loaded)} من ${fmtSize(e.total)})`; } };
+    x.onload = () => {
+      if (x.status >= 200 && x.status < 300) return res({ path, url: sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl });
+      let m = x.responseText; try { const j = JSON.parse(m); m = j.message || j.error || m; } catch {}
+      rej(new Error(`(${x.status}) ${m}`));
+    };
+    x.onerror = () => rej(new Error("فشل الاتصال أثناء الرفع، تحقق من الإنترنت"));
+    x.ontimeout = () => rej(new Error("انتهت مهلة الرفع"));
+    x.send(f);
+  });
 }
 function openForm(b) {
   editing = b ? b.id : null;
@@ -361,7 +377,7 @@ function openForm(b) {
   if (b) { $("title").value = b.title; $("author").value = b.author || ""; $("category").value = b.category || ""; $("desc").value = b.description || ""; }
   $("formTitle").textContent = b ? "تعديل: " + b.title : "إضافة كتاب";
   $("addBtn").textContent = b ? "حفظ التعديلات" : "إضافة";
-  $("hint").classList.toggle("hide", !b); $("msg").textContent = "";
+  $("hint").classList.toggle("hide", !b); $("msg").className = "err"; $("msg").textContent = "";
   srcMode("file", "file"); srcMode("cover", "file"); dlg.showModal();
 }
 const editBook = id => openForm(books.find(x => x.id === id));
@@ -370,10 +386,10 @@ async function saveBook() {
   if (!title) return $("msg").textContent = "أدخل العنوان";
   const old = editing ? books.find(b => b.id === editing) : null;
   const row = { title, author: $("author").value.trim(), category: $("category").value.trim(), description: $("desc").value.trim() };
-  $("addBtn").disabled = true; $("addBtn").textContent = "جارٍ الحفظ..."; $("msg").textContent = "";
+  $("addBtn").disabled = true; $("addBtn").textContent = "جارٍ الحفظ..."; $("msg").className = "mut"; $("msg").textContent = "جارٍ التحضير...";
   try {
     if (src.file === "file" && $("file").files[0]) {
-      const f = $("file").files[0], u = await upload(f, "files");
+      const f = $("file").files[0], u = await upload(f, "files", "الكتاب");
       row.file_url = u.url; row.file_path = u.path; row.file_size = f.size;
       if (old?.file_path) await sb.storage.from(BUCKET).remove([old.file_path]);
     } else if (src.file === "link" && $("fileLink").value.trim()) {
@@ -383,7 +399,7 @@ async function saveBook() {
       if (old?.file_path) await sb.storage.from(BUCKET).remove([old.file_path]);
     } else if (!old) throw new Error("اختر ملف الكتاب أو أدخل رابطًا");
     if (src.cover === "file" && $("cover").files[0]) {
-      const u = await upload($("cover").files[0], "covers");
+      const u = await upload($("cover").files[0], "covers", "الغلاف");
       row.cover_url = u.url; row.cover_path = u.path;
       if (old?.cover_path) await sb.storage.from(BUCKET).remove([old.cover_path]);
     } else if (src.cover === "link" && $("coverLink").value.trim()) {
@@ -392,10 +408,11 @@ async function saveBook() {
       row.cover_url = l; row.cover_path = null;
       if (old?.cover_path) await sb.storage.from(BUCKET).remove([old.cover_path]);
     }
+    $("msg").textContent = "جارٍ حفظ بيانات الكتاب...";
     const { error } = old ? await sb.from("books").update(row).eq("id", old.id) : await sb.from("books").insert(row);
     if (error) throw error;
     dlg.close(); toast("تم الحفظ ✅"); load();
-  } catch (e) { $("msg").textContent = "خطأ: " + e.message; }
+  } catch (e) { $("msg").className = "err"; $("msg").textContent = "خطأ: " + e.message; }
   $("addBtn").disabled = false; $("addBtn").textContent = old ? "حفظ التعديلات" : "إضافة";
 }
 async function delBook(id) {
