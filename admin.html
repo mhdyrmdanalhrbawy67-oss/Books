@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة التحكم</title>
+<style>
+:root{--bg:#f6f3ec;--surface:#fff;--ink:#17262b;--mut:#6b7a80;--line:#e6e0d3;--pri:#0f5c5c;--pri2:#0b4747;--onpri:#fff;--gold:#c8963e;--soft:#eaf3f1;--danger:#c0392b;--r:16px;--shadow:0 1px 2px rgba(20,40,45,.06),0 10px 28px rgba(20,40,45,.08)}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1a1d;--surface:#15262a;--ink:#eef3f2;--mut:#93a6aa;--line:#24393e;--pri:#3fb5a8;--pri2:#2e9488;--onpri:#062321;--gold:#e0b25a;--soft:#1a3136;--danger:#ef6b5b;--shadow:0 10px 28px rgba(0,0,0,.35)}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Cairo',Tahoma,Arial,sans-serif;line-height:1.7}
+a{color:var(--pri);text-decoration:none;font-weight:600}
+.hide{display:none!important}
+.mut{color:var(--mut);font-size:13px;margin:0}
+.err{color:var(--danger);font-size:14px;margin:8px 0 0}
+button{font-family:inherit;cursor:pointer;border:0;border-radius:12px;padding:10px 18px;font-size:15px;font-weight:700;background:var(--pri);color:var(--onpri);transition:.15s}
+button:hover{background:var(--pri2);transform:translateY(-1px)}
+button:disabled{opacity:.55;pointer-events:none}
+button.g{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button.g:hover{background:var(--soft)}
+button.d{background:transparent;color:var(--danger);border:1px solid var(--line);padding:6px 12px;font-size:13px}
+button.d:hover{background:var(--danger);color:#fff}
+button.s{padding:6px 12px;font-size:13px}
+input,select,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:15px;margin-bottom:12px;outline:0;transition:.15s}
+input:focus,select:focus,textarea:focus{border-color:var(--pri);box-shadow:0 0 0 4px color-mix(in srgb,var(--pri) 18%,transparent)}
+label.l{display:block;font-size:13px;font-weight:700;margin:4px 0 6px;color:var(--mut)}
+.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .in{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;color:var(--ink)}
+.logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--pri),var(--gold));display:grid;place-items:center;font-size:20px}
+.nav{display:flex;align-items:center;gap:10px}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--soft);color:var(--pri);display:grid;place-items:center;font-weight:800;object-fit:cover}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+footer{text-align:center;padding:28px 16px;color:var(--mut);font-size:14px}
+footer b{color:var(--gold)}
+.tag{display:inline-block;background:var(--soft);border-radius:30px;padding:2px 12px;font-size:12px;font-weight:700;color:var(--pri)}
+.tabs{display:flex;gap:8px;margin-bottom:10px}
+.tabs button{background:transparent;color:var(--mut);border:1px solid var(--line);padding:6px 14px;font-size:13px}
+.tabs button.on{background:var(--pri);color:var(--onpri);border-color:var(--pri)}
+.shell{max-width:1280px;margin:0 auto;padding:24px 20px;display:grid;grid-template-columns:230px 1fr;gap:24px;align-items:start}
+.sbar{position:sticky;top:84px;display:flex;flex-direction:column;gap:6px}
+.sbar button{background:transparent;color:var(--ink);text-align:right;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;font-weight:600}
+.sbar button:hover{background:var(--soft);transform:none}
+.sbar button.on{background:var(--pri);color:var(--onpri)}
+h2.pt{margin:0;font-size:24px}
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:10px;flex-wrap:wrap}
+.head .a{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.head input,.head select{width:auto;margin:0;padding:9px 12px;min-width:150px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:18px}
+.stat{display:flex;align-items:center;gap:14px;padding:16px}
+.stat .ic{width:46px;height:46px;border-radius:14px;background:var(--soft);display:grid;place-items:center;font-size:21px;flex:none}
+.stat b{display:block;font-size:24px;line-height:1.2}
+.stat small{color:var(--mut);font-size:12px;display:block}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-bottom:16px}
+.card h3{margin:0 0 14px;font-size:17px}
+.chart{display:flex;align-items:flex-end;gap:4px;height:170px}
+.col{flex:1;min-width:0;height:100%;display:flex;flex-direction:column}
+.stack{flex:1;display:flex;flex-direction:column;justify-content:flex-end}
+.stack i{display:block;border-radius:4px 4px 0 0;min-height:0}
+.lab{font-size:10px;color:var(--mut);text-align:center;margin-top:4px;height:14px;overflow:hidden}
+.leg{display:flex;gap:16px;font-size:13px;color:var(--mut);margin-top:10px}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-left:6px}
+.bar{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:14px}
+.bar span:first-child{width:130px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .t{flex:1;height:10px;border-radius:6px;background:var(--soft);overflow:hidden}
+.bar .t div{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--pri),var(--gold))}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th{font-size:12px;color:var(--mut);text-align:right;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:11px 10px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:middle}
+tr:last-child td{border-bottom:0}
+img.th{width:38px;height:52px;object-fit:cover;border-radius:6px;display:block}
+.ph{width:38px;height:52px;border-radius:6px;background:var(--soft);display:grid;place-items:center}
+.pill{padding:2px 12px;border-radius:30px;font-size:12px;font-weight:700;background:var(--soft);color:var(--pri);white-space:nowrap}
+.pill.a{background:color-mix(in srgb,var(--gold) 25%,transparent);color:var(--gold)}
+.pill.v{background:color-mix(in srgb,#6366f1 18%,transparent);color:#818cf8}
+.ub{display:flex;align-items:center;gap:10px}
+.sec{display:none}.sec.on{display:block}
+dialog{border:0;border-radius:20px;padding:0;width:min(640px,94vw);background:var(--surface);color:var(--ink);box-shadow:0 30px 80px rgba(0,0,0,.4)}
+dialog::backdrop{background:rgba(5,15,18,.55);backdrop-filter:blur(3px)}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line)}
+.dh h3{margin:0}.db{padding:20px 22px;max-height:70vh;overflow:auto}
+.df{padding:14px 22px;border-top:1px solid var(--line);display:flex;gap:10px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0 12px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 22px;border-radius:30px;font-weight:700;z-index:99;opacity:0;pointer-events:none;transition:.25s}
+#toast.show{opacity:1}
+@media(max-width:860px){.shell{grid-template-columns:1fr}.sbar{position:static;flex-direction:row;overflow-x:auto}.sbar button{white-space:nowrap}}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+/* ===== إعدادات Supabase ===== */
+const SUPABASE_URL = "https://ejutbpumrnvuoftvwais.supabase.co";
+const SUPABASE_KEY = "sb_publishable_whwX3xnNzZcNbs90ejhEGA_SiA-gPgZ";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const BUCKET = "library";
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const safeUrl = u => /^https?:\/\//i.test(u || "") ? u : "";
+async function getUser() { return (await sb.auth.getUser()).data.user; }
+async function getRole(u) { const { data } = await sb.from("profiles").select("role").eq("id", u.id).single(); return data?.role || "user"; }
+async function logout() { await sb.auth.signOut(); location.href = "index.html"; }
+const avatarHtml = u => u?.user_metadata?.avatar_url
+  ? `<img class="avatar" src="${esc(safeUrl(u.user_metadata.avatar_url))}" referrerpolicy="no-referrer" alt="">`
+  : `<div class="avatar">${esc((u?.email || "?")[0].toUpperCase())}</div>`;
+</script>
+</head>
+<body>
+<header class="top"><div class="in">
+  <a class="brand" href="admin.html"><span class="logo">⚙️</span> لوحة التحكم</a>
+  <div class="nav"><a href="index.html">← المكتبة</a><span id="av"></span><button class="g s" onclick="logout()">خروج</button></div>
+</div></header>
+
+<div id="denied" class="wrap hide"><div class="card"><p class="err" style="margin:0">هذه الصفحة للمدراء فقط.</p></div></div>
+
+<div id="panel" class="shell hide">
+  <aside class="sbar">
+    <button data-t="ov" class="on">📊 نظرة عامة</button>
+    <button data-t="bk">📚 الكتب</button>
+    <button data-t="us">👥 المستخدمون</button>
+    <button data-t="ac">🕒 سجل النشاط</button>
+  </aside>
+  <main>
+
+    <section id="ov" class="sec on">
+      <div class="head"><h2 class="pt">نظرة عامة</h2><div class="a"><button class="g s" onclick="load()">↻ تحديث</button></div></div>
+      <div class="stats" id="stats"></div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="head" style="margin-bottom:10px"><h3 style="margin:0">التحميلات والمشاهدات</h3>
+          <select id="range" onchange="drawCharts()"><option value="7">آخر 7 أيام</option><option value="14" selected>آخر 14 يومًا</option><option value="30">آخر 30 يومًا</option></select></div>
+        <div id="chEv" class="chart"></div>
+        <div class="leg"><span><i style="background:var(--pri)"></i>تحميل</span><span><i style="background:var(--gold)"></i>مشاهدة</span></div>
+      </div>
+      <div class="g2">
+        <div class="card"><h3>تسجيلات المستخدمين الجدد</h3><div id="chUs" class="chart"></div></div>
+        <div class="card"><h3>الكتب حسب التصنيف</h3><div id="cats"></div></div>
+      </div>
+      <div class="g2">
+        <div class="card"><h3>🔥 الأكثر تحميلًا</h3><div id="topDl"></div></div>
+        <div class="card"><h3>👁 الأكثر مشاهدة</h3><div id="topVw"></div></div>
+        <div class="card"><h3>♥ الأكثر إضافة للمفضلة</h3><div id="topFv"></div></div>
+        <div class="card"><h3>👑 أنشط المستخدمين (30 يومًا)</h3><div id="topUs"></div></div>
+      </div>
+      <div class="card tw"><h3>آخر النشاطات</h3><table><thead><tr><th>الوقت</th><th>المستخدم</th><th>الكتاب</th><th>النوع</th></tr></thead><tbody id="recent"></tbody></table></div>
+    </section>
+
+    <section id="bk" class="sec">
+      <div class="head"><h2 class="pt">الكتب</h2>
+        <div class="a"><input id="bq" placeholder="🔍 بحث..." oninput="drawBooks()">
+          <select id="bs" onchange="drawBooks()"><option value="new">الأحدث</option><option value="dl">الأكثر تحميلًا</option><option value="vw">الأكثر مشاهدة</option><option value="fv">الأكثر مفضلة</option><option value="az">الاسم</option></select>
+          <button class="g s" onclick="exportBooks()">⬇ CSV</button><button onclick="openForm()">＋ إضافة كتاب</button></div></div>
+      <div class="card tw"><table><thead><tr><th></th><th>العنوان</th><th>التصنيف</th><th>الحجم</th><th>تحميل</th><th>مشاهدة</th><th>مفضلة</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+    </section>
+
+    <section id="us" class="sec">
+      <div class="head"><h2 class="pt">المستخدمون</h2>
+        <div class="a"><input id="uq" placeholder="🔍 اسم أو بريد..." oninput="drawUsers()">
+          <select id="uf" onchange="drawUsers()"><option value="">الكل</option><option value="admin">المدراء</option><option value="user">المستخدمون</option></select>
+          <button class="g s" onclick="exportUsers()">⬇ CSV</button></div></div>
+      <div class="card tw"><table><thead><tr><th>المستخدم</th><th>الصلاحية</th><th>تحميلات (30 يومًا)</th><th>آخر ظهور</th><th>التسجيل</th><th></th></tr></thead><tbody id="users"></tbody></table></div>
+    </section>
+
+    <section id="ac" class="sec">
+      <div class="head"><h2 class="pt">سجل النشاط</h2>
+        <div class="a"><select id="af" onchange="drawActivity()"><option value="">الكل</option><option value="download">التحميلات</option><option value="view">المشاهدات</option></select>
+          <button class="g s" onclick="exportEvents()">⬇ CSV</button></div></div>
+      <div class="card tw"><table><thead><tr><th>الوقت</th><th>المستخدم</th><th>الكتاب</th><th>النوع</th></tr></thead><tbody id="acts"></tbody></table></div>
+      <p class="mut" style="margin-top:10px">يُعرض آخر 150 نشاطًا من آخر 30 يومًا.</p>
+    </section>
+  </main>
+</div>
+
+<dialog id="dlg">
+  <div class="dh"><h3 id="formTitle">إضافة كتاب</h3><button class="g s" onclick="dlg.close()">✕</button></div>
+  <div class="db">
+    <label class="l">العنوان *</label><input id="title">
+    <div class="row">
+      <div><label class="l">المؤلف</label><input id="author"></div>
+      <div><label class="l">التصنيف</label><input id="category" list="catlist"><datalist id="catlist"></datalist></div>
+    </div>
+    <label class="l">وصف مختصر</label><textarea id="desc" rows="3"></textarea>
+    <label class="l">ملف الكتاب</label>
+    <div class="tabs"><button id="tfFile" class="on" onclick="srcMode('file','file')">من الجهاز</button><button id="tfLink" onclick="srcMode('file','link')">رابط</button></div>
+    <input id="file" type="file"><input id="fileLink" class="hide" placeholder="https://...">
+    <label class="l">صورة الغلاف (اختياري)</label>
+    <div class="tabs"><button id="tcFile" class="on" onclick="srcMode('cover','file')">من الجهاز</button><button id="tcLink" onclick="srcMode('cover','link')">رابط</button></div>
+    <input id="cover" type="file" accept="image/*"><input id="coverLink" class="hide" placeholder="https://...">
+    <p id="hint" class="mut hide">اترك الملف أو الغلاف فارغًا للإبقاء على الحالي.</p>
+    <p id="msg" class="err"></p>
+  </div>
+  <div class="df"><button id="addBtn" onclick="saveBook()">إضافة</button><button class="g" onclick="dlg.close()">إلغاء</button></div>
+</dialog>
+<div id="toast"></div>
+<footer>جميع الحقوق محفوظة © للمطور <b>محمد رمضان الحرباوي</b></footer>
+
+<script>
+const DAY = 864e5;
+let books = [], ps = [], events = [], favRows = [], me = null, editing = null, src = { file: "file", cover: "file" };
+const toast = t => { const e = $("toast"); e.textContent = t; e.classList.add("show"); setTimeout(() => e.classList.remove("show"), 2600); };
+const fmtSize = n => !n ? "—" : n > 1048576 ? (n / 1048576).toFixed(1) + " م.ب" : Math.max(1, Math.round(n / 1024)) + " ك.ب";
+const fmtBig = n => n > 1073741824 ? (n / 1073741824).toFixed(2) + " ج.ب" : fmtSize(n);
+const fmtDT = d => new Date(d).toLocaleString("ar-EG", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+const fmtD = d => d ? new Date(d).toLocaleDateString("ar-EG", { year: "numeric", month: "short", day: "numeric" }) : "—";
+const uname = id => { const p = ps.find(x => x.id === id); return p ? (p.full_name || p.email) : "مستخدم محذوف"; };
+const bname = id => books.find(x => x.id === id)?.title || "كتاب محذوف";
+const favCount = {}; 
+
+document.querySelectorAll(".sbar button").forEach(b => b.onclick = () => {
+  document.querySelectorAll(".sbar button,.sec").forEach(x => x.classList.remove("on"));
+  b.classList.add("on"); $(b.dataset.t).classList.add("on");
+});
+function srcMode(kind, m) {
+  src[kind] = m;
+  const p = kind === "file" ? ["tfFile","tfLink","file","fileLink"] : ["tcFile","tcLink","cover","coverLink"];
+  $(p[0]).classList.toggle("on", m === "file"); $(p[1]).classList.toggle("on", m === "link");
+  $(p[2]).classList.toggle("hide", m !== "file"); $(p[3]).classList.toggle("hide", m !== "link");
+}
+
+async function load() {
+  me = await getUser();
+  if (!me) return location.href = "index.html";
+  if (await getRole(me) !== "admin") return $("denied").classList.remove("hide");
+  $("panel").classList.remove("hide");
+  const since = new Date(Date.now() - 30 * DAY).toISOString();
+  const [b, p, e, f] = await Promise.all([
+    sb.from("books").select("*").order("created_at", { ascending: false }),
+    sb.from("profiles").select("*").order("created_at", { ascending: false }),
+    sb.from("book_events").select("*").gte("created_at", since).order("created_at", { ascending: false }).limit(5000),
+    sb.from("favorites").select("book_id,user_id")
+  ]);
+  books = b.data || []; ps = p.data || []; events = e.data || []; favRows = f.data || [];
+  Object.keys(favCount).forEach(k => delete favCount[k]);
+  favRows.forEach(r => favCount[r.book_id] = (favCount[r.book_id] || 0) + 1);
+  const me2 = ps.find(x => x.id === me.id);
+  $("av").innerHTML = avatarHtml({ email: me2?.full_name || me.email });
+  $("catlist").innerHTML = [...new Set(books.map(x => x.category).filter(Boolean))].map(c => `<option value="${esc(c)}">`).join("");
+  drawStats(); drawCharts(); drawLists(); drawBooks(); drawUsers(); drawActivity();
+}
+
+/* ---------- الإحصائيات ---------- */
+function drawStats() {
+  const wk = Date.now() - 7 * DAY;
+  const dl = books.reduce((s, b) => s + b.downloads, 0), vw = books.reduce((s, b) => s + b.views, 0);
+  const size = books.reduce((s, b) => s + (b.file_size || 0), 0);
+  const cards = [
+    ["📚", books.length, "إجمالي الكتب", `+${books.filter(b => new Date(b.created_at) > wk).length} هذا الأسبوع`],
+    ["👥", ps.length, "المستخدمون", `+${ps.filter(p => new Date(p.created_at) > wk).length} هذا الأسبوع`],
+    ["🛡️", ps.filter(p => p.role === "admin").length, "المدراء", ""],
+    ["🟢", ps.filter(p => p.last_seen && new Date(p.last_seen) > wk).length, "نشطون آخر 7 أيام", ""],
+    ["⬇️", dl, "إجمالي التحميلات", `${events.filter(e => e.kind === "download" && new Date(e.created_at) > wk).length} هذا الأسبوع`],
+    ["👁", vw, "إجمالي المشاهدات", `${events.filter(e => e.kind === "view" && new Date(e.created_at) > wk).length} هذا الأسبوع`],
+    ["♥", favRows.length, "إجمالي المفضلات", ""],
+    ["💾", fmtBig(size), "حجم الملفات المرفوعة", "للملفات المرفوعة فقط"],
+    ["📈", books.length ? (dl / books.length).toFixed(1) : 0, "متوسط التحميل للكتاب", ""],
+    ["🗂️", new Set(books.map(b => b.category).filter(Boolean)).size, "عدد التصنيفات", ""]
+  ];
+  $("stats").innerHTML = cards.map(c => `<div class="card stat"><div class="ic">${c[0]}</div><div><b>${c[1]}</b><span class="mut">${c[2]}</span>${c[3] ? `<small>${c[3]}</small>` : ""}</div></div>`).join("");
+}
+function buckets(n) {
+  const base = new Date(); base.setHours(0, 0, 0, 0);
+  return Array.from({ length: n }, (_, i) => { const d = new Date(base - (n - 1 - i) * DAY); return { d, k: d.toDateString(), dl: 0, vw: 0, nu: 0 }; });
+}
+function bars(el, bk, ser) {
+  const mx = Math.max(1, ...bk.map(b => ser.reduce((s, x) => s + b[x.k], 0)));
+  const step = bk.length > 14 ? 3 : 1;
+  $(el).innerHTML = bk.map((b, i) => `<div class="col" title="${b.d.toLocaleDateString("ar-EG")}: ${ser.map(x => x.n + " " + b[x.k]).join(" · ")}">
+    <div class="stack">${ser.map(x => `<i style="height:${b[x.k] / mx * 100}%;background:${x.c}"></i>`).join("")}</div>
+    <div class="lab">${i % step === 0 ? b.d.getDate() : ""}</div></div>`).join("");
+}
+function drawCharts() {
+  const n = +$("range").value, bk = buckets(n), map = Object.fromEntries(bk.map(b => [b.k, b]));
+  events.forEach(e => { const b = map[new Date(e.created_at).toDateString()]; if (b) e.kind === "view" ? b.vw++ : b.dl++; });
+  bars("chEv", bk, [{ k: "dl", c: "var(--pri)", n: "تحميل" }, { k: "vw", c: "var(--gold)", n: "مشاهدة" }]);
+  const bu = buckets(n), mu = Object.fromEntries(bu.map(b => [b.k, b]));
+  ps.forEach(p => { const b = mu[new Date(p.created_at).toDateString()]; if (b) b.nu++; });
+  bars("chUs", bu, [{ k: "nu", c: "var(--pri)", n: "مستخدم جديد" }]);
+}
+function barList(el, rows) {
+  const mx = Math.max(1, ...rows.map(r => r[1]));
+  $(el).innerHTML = rows.map(r => `<div class="bar"><span title="${esc(r[0])}">${esc(r[0])}</span><div class="t"><div style="width:${r[1] / mx * 100}%"></div></div><span class="mut" style="width:auto">${r[1]}</span></div>`).join("") || '<p class="mut">لا توجد بيانات.</p>';
+}
+function drawLists() {
+  const by = {}; books.forEach(b => { const c = b.category || "بدون تصنيف"; by[c] = (by[c] || 0) + 1; });
+  barList("cats", Object.entries(by).sort((a, b) => b[1] - a[1]));
+  barList("topDl", [...books].sort((a, b) => b.downloads - a.downloads).slice(0, 5).filter(b => b.downloads).map(b => [b.title, b.downloads]));
+  barList("topVw", [...books].sort((a, b) => b.views - a.views).slice(0, 5).filter(b => b.views).map(b => [b.title, b.views]));
+  barList("topFv", books.map(b => [b.title, favCount[b.id] || 0]).filter(r => r[1]).sort((a, b) => b[1] - a[1]).slice(0, 5));
+  const uc = {}; events.forEach(e => { if (e.user_id) uc[e.user_id] = (uc[e.user_id] || 0) + 1; });
+  barList("topUs", Object.entries(uc).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([id, n]) => [uname(id), n]));
+  $("recent").innerHTML = events.slice(0, 8).map(evRow).join("") || '<tr><td colspan="4" class="mut">لا يوجد نشاط بعد.</td></tr>';
+}
+const evRow = e => `<tr><td class="mut">${fmtDT(e.created_at)}</td><td>${esc(uname(e.user_id))}</td><td>${esc(bname(e.book_id))}</td><td><span class="pill ${e.kind === "view" ? "v" : ""}">${e.kind === "view" ? "مشاهدة" : "تحميل"}</span></td></tr>`;
+
+/* ---------- الكتب ---------- */
+function drawBooks() {
+  const t = $("bq").value.trim().toLowerCase(), s = $("bs").value;
+  let l = books.filter(b => ((b.title || "") + (b.author || "") + (b.category || "")).toLowerCase().includes(t));
+  if (s === "dl") l.sort((a, b) => b.downloads - a.downloads);
+  else if (s === "vw") l.sort((a, b) => b.views - a.views);
+  else if (s === "fv") l.sort((a, b) => (favCount[b.id] || 0) - (favCount[a.id] || 0));
+  else if (s === "az") l.sort((a, b) => (a.title || "").localeCompare(b.title || "", "ar"));
+  $("rows").innerHTML = l.map(b => `<tr>
+    <td>${safeUrl(b.cover_url) ? `<img class="th" src="${esc(safeUrl(b.cover_url))}" alt="">` : '<div class="ph">📖</div>'}</td>
+    <td><b>${esc(b.title)}</b><br><span class="mut">${esc(b.author)} · ${fmtD(b.created_at)}</span></td>
+    <td>${b.category ? `<span class="pill">${esc(b.category)}</span>` : ""}</td>
+    <td>${fmtSize(b.file_size)}</td><td>${b.downloads}</td><td>${b.views}</td><td>${favCount[b.id] || 0}</td>
+    <td style="white-space:nowrap"><button class="s g" onclick="editBook('${b.id}')">تعديل</button> <button class="d" onclick="delBook('${b.id}')">حذف</button></td></tr>`).join("")
+    || '<tr><td colspan="8" class="mut">لا توجد كتب.</td></tr>';
+}
+
+/* ---------- المستخدمون ---------- */
+function drawUsers() {
+  const t = $("uq").value.trim().toLowerCase(), f = $("uf").value;
+  const dl30 = {}; events.forEach(e => { if (e.kind === "download" && e.user_id) dl30[e.user_id] = (dl30[e.user_id] || 0) + 1; });
+  $("users").innerHTML = ps.filter(p => (!f || p.role === f) && ((p.email || "") + (p.full_name || "")).toLowerCase().includes(t)).map(p => `<tr>
+    <td><div class="ub"><div class="avatar">${esc((p.full_name || p.email || "?")[0].toUpperCase())}</div><div><b>${esc(p.full_name || "—")}</b><br><span class="mut">${esc(p.email)}</span></div></div></td>
+    <td><span class="pill ${p.role === "admin" ? "a" : ""}">${p.role === "admin" ? "مدير" : "مستخدم"}</span></td>
+    <td>${dl30[p.id] || 0}</td><td class="mut">${p.last_seen ? fmtDT(p.last_seen) : "—"}</td><td class="mut">${fmtD(p.created_at)}</td>
+    <td>${p.id === me.id ? '<span class="mut">(أنت)</span>' : `<button class="s ${p.role === "admin" ? "g" : ""}" onclick="setRole('${p.id}','${p.role === "admin" ? "user" : "admin"}')">${p.role === "admin" ? "إزالة الإدارة" : "ترقية لمدير"}</button>`}</td></tr>`).join("")
+    || '<tr><td colspan="6" class="mut">لا يوجد مستخدمون.</td></tr>';
+}
+async function setRole(id, role) {
+  if (!confirm(role === "admin" ? "ترقية هذا المستخدم إلى مدير؟" : "إزالة صلاحية الإدارة؟")) return;
+  const { error } = await sb.from("profiles").update({ role }).eq("id", id);
+  toast(error ? error.message : "تم تحديث الصلاحية ✅"); load();
+}
+
+/* ---------- النشاط ---------- */
+function drawActivity() {
+  const f = $("af").value;
+  $("acts").innerHTML = events.filter(e => !f || e.kind === f).slice(0, 150).map(evRow).join("") || '<tr><td colspan="4" class="mut">لا يوجد نشاط.</td></tr>';
+}
+
+/* ---------- تصدير CSV ---------- */
+function csv(name, rows) {
+  const t = rows.map(r => r.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob(["\ufeff" + t], { type: "text/csv;charset=utf-8" }));
+  a.download = name + ".csv"; a.click(); URL.revokeObjectURL(a.href);
+}
+const exportBooks = () => csv("books", [["العنوان","المؤلف","التصنيف","الحجم (بايت)","التحميلات","المشاهدات","المفضلة","تاريخ الإضافة","الرابط"],
+  ...books.map(b => [b.title, b.author, b.category, b.file_size, b.downloads, b.views, favCount[b.id] || 0, b.created_at, b.file_url])]);
+const exportUsers = () => csv("users", [["الاسم","البريد","الصلاحية","آخر ظهور","تاريخ التسجيل"],
+  ...ps.map(p => [p.full_name, p.email, p.role, p.last_seen, p.created_at])]);
+const exportEvents = () => csv("activity", [["الوقت","المستخدم","الكتاب","النوع"],
+  ...events.map(e => [e.created_at, uname(e.user_id), bname(e.book_id), e.kind])]);
+
+/* ---------- إضافة / تعديل / حذف ---------- */
+async function upload(f, folder) {
+  const path = `${folder}/${Date.now()}-${f.name.replace(/[^\w.\-]/g, "_")}`;
+  const { error } = await sb.storage.from(BUCKET).upload(path, f);
+  if (error) throw error;
+  return { path, url: sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl };
+}
+function openForm(b) {
+  editing = b ? b.id : null;
+  ["title","author","category","desc","file","fileLink","cover","coverLink"].forEach(i => $(i).value = "");
+  if (b) { $("title").value = b.title; $("author").value = b.author || ""; $("category").value = b.category || ""; $("desc").value = b.description || ""; }
+  $("formTitle").textContent = b ? "تعديل: " + b.title : "إضافة كتاب";
+  $("addBtn").textContent = b ? "حفظ التعديلات" : "إضافة";
+  $("hint").classList.toggle("hide", !b); $("msg").textContent = "";
+  srcMode("file", "file"); srcMode("cover", "file"); dlg.showModal();
+}
+const editBook = id => openForm(books.find(x => x.id === id));
+async function saveBook() {
+  const title = $("title").value.trim();
+  if (!title) return $("msg").textContent = "أدخل العنوان";
+  const old = editing ? books.find(b => b.id === editing) : null;
+  const row = { title, author: $("author").value.trim(), category: $("category").value.trim(), description: $("desc").value.trim() };
+  $("addBtn").disabled = true; $("addBtn").textContent = "جارٍ الحفظ..."; $("msg").textContent = "";
+  try {
+    if (src.file === "file" && $("file").files[0]) {
+      const f = $("file").files[0], u = await upload(f, "files");
+      row.file_url = u.url; row.file_path = u.path; row.file_size = f.size;
+      if (old?.file_path) await sb.storage.from(BUCKET).remove([old.file_path]);
+    } else if (src.file === "link" && $("fileLink").value.trim()) {
+      const l = $("fileLink").value.trim();
+      if (!safeUrl(l)) throw new Error("رابط الكتاب غير صالح (يجب أن يبدأ بـ https://)");
+      row.file_url = l; row.file_path = null; row.file_size = null;
+      if (old?.file_path) await sb.storage.from(BUCKET).remove([old.file_path]);
+    } else if (!old) throw new Error("اختر ملف الكتاب أو أدخل رابطًا");
+    if (src.cover === "file" && $("cover").files[0]) {
+      const u = await upload($("cover").files[0], "covers");
+      row.cover_url = u.url; row.cover_path = u.path;
+      if (old?.cover_path) await sb.storage.from(BUCKET).remove([old.cover_path]);
+    } else if (src.cover === "link" && $("coverLink").value.trim()) {
+      const l = $("coverLink").value.trim();
+      if (!safeUrl(l)) throw new Error("رابط الصورة غير صالح (يجب أن يبدأ بـ https://)");
+      row.cover_url = l; row.cover_path = null;
+      if (old?.cover_path) await sb.storage.from(BUCKET).remove([old.cover_path]);
+    }
+    const { error } = old ? await sb.from("books").update(row).eq("id", old.id) : await sb.from("books").insert(row);
+    if (error) throw error;
+    dlg.close(); toast("تم الحفظ ✅"); load();
+  } catch (e) { $("msg").textContent = "خطأ: " + e.message; }
+  $("addBtn").disabled = false; $("addBtn").textContent = old ? "حفظ التعديلات" : "إضافة";
+}
+async function delBook(id) {
+  if (!confirm("حذف هذا الكتاب نهائيًا مع ملفاته؟")) return;
+  const b = books.find(x => x.id === id);
+  const paths = [b.file_path, b.cover_path].filter(Boolean);
+  if (paths.length) await sb.storage.from(BUCKET).remove(paths);
+  await sb.from("books").delete().eq("id", id);
+  toast("تم الحذف"); load();
+}
+load();
+</script>
+</body>
+</html>
