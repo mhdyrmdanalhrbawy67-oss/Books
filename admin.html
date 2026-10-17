@@ -84,6 +84,7 @@ dialog::backdrop{background:rgba(5,15,18,.55);backdrop-filter:blur(3px)}
 .dh h3{margin:0}.db{padding:20px 22px;max-height:70vh;overflow:auto}
 .df{padding:14px 22px;border-top:1px solid var(--line);display:flex;gap:10px}
 .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0 12px}
+.th-teal{background:linear-gradient(120deg,#0b3b3b,#1c7a6e)}.th-gold{background:linear-gradient(120deg,#6b410a,#d49a3a)}.th-purple{background:linear-gradient(120deg,#2e1065,#7c3aed)}.th-rose{background:linear-gradient(120deg,#7f1d3a,#e0405a)}.th-blue{background:linear-gradient(120deg,#0c2d6b,#2f7de1)}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 22px;border-radius:30px;font-weight:700;z-index:99;opacity:0;pointer-events:none;transition:.25s}
 #toast.show{opacity:1}
 @media(max-width:860px){.shell{grid-template-columns:1fr}.sbar{position:static;flex-direction:row;overflow-x:auto}.sbar button{white-space:nowrap}}
@@ -122,6 +123,8 @@ const avatarHtml = u => u?.user_metadata?.avatar_url
     <button data-t="bk">📚 الكتب</button>
     <button data-t="us">👥 المستخدمون</button>
     <button data-t="ac">🕒 سجل النشاط</button>
+    <button data-t="bn">🎬 البانرات</button>
+    <button data-t="nt">🔔 الإشعارات</button>
   </aside>
   <main>
 
@@ -170,6 +173,18 @@ const avatarHtml = u => u?.user_metadata?.avatar_url
       <div class="card tw"><table><thead><tr><th>الوقت</th><th>المستخدم</th><th>الكتاب</th><th>النوع</th></tr></thead><tbody id="acts"></tbody></table></div>
       <p class="mut" style="margin-top:10px">يُعرض آخر 150 نشاطًا من آخر 30 يومًا.</p>
     </section>
+
+    <section id="bn" class="sec">
+      <div class="head"><h2 class="pt">البانرات المتحركة</h2><div class="a"><button onclick="openBn()">＋ إضافة بانر</button></div></div>
+      <div class="card tw"><table><thead><tr><th>المعاينة</th><th>العنوان</th><th>الترتيب</th><th>النقرات</th><th>الحالة</th><th></th></tr></thead><tbody id="bnRows"></tbody></table></div>
+      <p class="mut" style="margin-top:10px">تظهر البانرات المفعّلة في أعلى المكتبة كعرض متحرك. الترتيب الأصغر يظهر أولًا، ويمكن جدولة البانر بتاريخ بداية ونهاية.</p>
+    </section>
+
+    <section id="nt" class="sec">
+      <div class="head"><h2 class="pt">الإشعارات</h2><div class="a"><button onclick="openNt()">＋ إرسال إشعار</button></div></div>
+      <div class="card tw"><table><thead><tr><th>الإشعار</th><th>الموجّه إلى</th><th>الإرسال</th><th>مقروء</th><th></th></tr></thead><tbody id="ntRows"></tbody></table></div>
+      <p class="mut" style="margin-top:10px">تصل الإشعارات للمستخدمين فورًا وهم داخل المكتبة (الجرس 🔔)، وتُرسَل تلقائيًا عند إضافة كتاب جديد إن اخترت ذلك.</p>
+    </section>
   </main>
 </div>
 
@@ -189,14 +204,54 @@ const avatarHtml = u => u?.user_metadata?.avatar_url
     <div class="tabs"><button id="tcFile" class="on" onclick="srcMode('cover','file')">من الجهاز</button><button id="tcLink" onclick="srcMode('cover','link')">رابط</button></div>
     <input id="cover" type="file" accept="image/*"><input id="coverLink" class="hide" placeholder="https://...">
     <p id="hint" class="mut hide">اترك الملف أو الغلاف فارغًا للإبقاء على الحالي.</p>
+    <label id="notifyBox" style="display:flex;gap:8px;align-items:center;font-size:14px;margin-top:6px"><input type="checkbox" id="notify" checked style="width:auto;margin:0"> أرسل إشعارًا للجميع بهذا الكتاب</label>
   </div>
   <div class="df"><button id="addBtn" onclick="saveBook()">إضافة</button><button class="g" onclick="dlg.close()">إلغاء</button><p id="msg" class="err" style="margin:0;align-self:center;flex:1;font-size:13px"></p></div>
+</dialog>
+<dialog id="dBn">
+  <div class="dh"><h3 id="bnTitle">إضافة بانر</h3><button class="g s" onclick="dBn.close()">✕</button></div>
+  <div class="db">
+    <label class="l">العنوان *</label><input id="bnT" placeholder="مثال: وصل جديد من كتب التاريخ">
+    <label class="l">نص فرعي</label><input id="bnS">
+    <div class="row">
+      <div><label class="l">اللون (لو بدون صورة)</label><select id="bnTheme"><option value="teal">أخضر</option><option value="gold">ذهبي</option><option value="purple">بنفسجي</option><option value="rose">وردي</option><option value="blue">أزرق</option></select></div>
+      <div><label class="l">الترتيب</label><input id="bnSort" type="number" value="0"></div>
+    </div>
+    <div class="row">
+      <div><label class="l">نص الزر (اختياري)</label><input id="bnLT" placeholder="تصفح الآن"></div>
+      <div><label class="l">رابط الزر</label><input id="bnL" placeholder="https://... أو book:معرّف_الكتاب"></div>
+    </div>
+    <label class="l">صورة الخلفية (اختياري)</label>
+    <input id="bnImg" type="file" accept="image/*"><input id="bnImgL" placeholder="أو رابط صورة https://...">
+    <div class="row">
+      <div><label class="l">يبدأ في (اختياري)</label><input id="bnSt" type="datetime-local"></div>
+      <div><label class="l">ينتهي في (اختياري)</label><input id="bnEn" type="datetime-local"></div>
+    </div>
+    <label style="display:flex;gap:8px;align-items:center;font-size:14px"><input type="checkbox" id="bnAct" checked style="width:auto;margin:0"> مفعّل</label>
+    <p id="hintB" class="mut hide" style="margin-top:8px">اترك الصورة فارغة للإبقاء على الحالية.</p>
+  </div>
+  <div class="df"><button id="bnBtn" onclick="saveBn()">حفظ</button><button class="g" onclick="dBn.close()">إلغاء</button><p id="bnMsg" class="err" style="margin:0;align-self:center;flex:1;font-size:13px"></p></div>
+</dialog>
+
+<dialog id="dNt">
+  <div class="dh"><h3>إرسال إشعار</h3><button class="g s" onclick="dNt.close()">✕</button></div>
+  <div class="db">
+    <label class="l">العنوان *</label><input id="ntT">
+    <label class="l">النص</label><textarea id="ntB" rows="3"></textarea>
+    <div class="row">
+      <div><label class="l">النوع</label><select id="ntK"><option value="info">ℹ️ معلومة</option><option value="success">✅ خبر سار</option><option value="warning">⚠️ تنبيه</option><option value="book">📚 كتاب</option></select></div>
+      <div><label class="l">الموجّه إلى</label><select id="ntU"></select></div>
+    </div>
+    <label class="l">رابط عند الضغط (اختياري)</label><input id="ntL" placeholder="https://... أو book:معرّف_الكتاب">
+  </div>
+  <div class="df"><button id="ntBtn" onclick="saveNt()">إرسال</button><button class="g" onclick="dNt.close()">إلغاء</button><p id="ntMsg" class="err" style="margin:0;align-self:center;flex:1;font-size:13px"></p></div>
 </dialog>
 <div id="toast"></div>
 <footer>جميع الحقوق محفوظة © للمطور <b>محمد رمضان الحرباوي</b></footer>
 
 <script>
 const DAY = 864e5;
+let banners = [], notifs = [], reads = [];
 let books = [], ps = [], events = [], favRows = [], me = null, editing = null, src = { file: "file", cover: "file" };
 const toast = t => { const e = $("toast"); e.textContent = t; e.classList.add("show"); setTimeout(() => e.classList.remove("show"), 2600); };
 const fmtSize = n => !n ? "—" : n > 1048576 ? (n / 1048576).toFixed(1) + " م.ب" : Math.max(1, Math.round(n / 1024)) + " ك.ب";
@@ -224,19 +279,23 @@ async function load() {
   if (await getRole(me) !== "admin") return $("denied").classList.remove("hide");
   $("panel").classList.remove("hide");
   const since = new Date(Date.now() - 30 * DAY).toISOString();
-  const [b, p, e, f] = await Promise.all([
+  const [b, p, e, f, bnq, ntq, nrq] = await Promise.all([
     sb.from("books").select("*").order("created_at", { ascending: false }),
     sb.from("profiles").select("*").order("created_at", { ascending: false }),
     sb.from("book_events").select("*").gte("created_at", since).order("created_at", { ascending: false }).limit(5000),
-    sb.from("favorites").select("book_id,user_id")
+    sb.from("favorites").select("book_id,user_id"),
+    sb.from("banners").select("*").order("sort").order("created_at", { ascending: false }),
+    sb.from("notifications").select("*").order("created_at", { ascending: false }).limit(200),
+    sb.from("notification_reads").select("notification_id")
   ]);
   books = b.data || []; ps = p.data || []; events = e.data || []; favRows = f.data || [];
+  banners = bnq.data || []; notifs = ntq.data || []; reads = nrq.data || [];
   Object.keys(favCount).forEach(k => delete favCount[k]);
   favRows.forEach(r => favCount[r.book_id] = (favCount[r.book_id] || 0) + 1);
   const me2 = ps.find(x => x.id === me.id);
   $("av").innerHTML = avatarHtml({ email: me2?.full_name || me.email });
   $("catlist").innerHTML = [...new Set(books.map(x => x.category).filter(Boolean))].map(c => `<option value="${esc(c)}">`).join("");
-  drawStats(); drawCharts(); drawLists(); drawBooks(); drawUsers(); drawActivity();
+  drawStats(); drawCharts(); drawLists(); drawBooks(); drawUsers(); drawActivity(); drawBanners(); drawNotifs();
 }
 
 /* ---------- الإحصائيات ---------- */
@@ -254,7 +313,9 @@ function drawStats() {
     ["♥", favRows.length, "إجمالي المفضلات", ""],
     ["💾", fmtBig(size), "حجم الملفات المرفوعة", "للملفات المرفوعة فقط"],
     ["📈", books.length ? (dl / books.length).toFixed(1) : 0, "متوسط التحميل للكتاب", ""],
-    ["🗂️", new Set(books.map(b => b.category).filter(Boolean)).size, "عدد التصنيفات", ""]
+    ["🗂️", new Set(books.map(b => b.category).filter(Boolean)).size, "عدد التصنيفات", ""],
+    ["🎬", banners.reduce((s, b) => s + b.clicks, 0), "نقرات البانرات", `${banners.filter(b => b.active).length} بانر مفعّل`],
+    ["🔔", notifs.length, "إشعارات مُرسلة", ""]
   ];
   $("stats").innerHTML = cards.map(c => `<div class="card stat"><div class="ic">${c[0]}</div><div><b>${c[1]}</b><span class="mut">${c[2]}</span>${c[3] ? `<small>${c[3]}</small>` : ""}</div></div>`).join("");
 }
@@ -364,7 +425,7 @@ function upload(f, folder, label) {
     x.onload = () => {
       if (x.status >= 200 && x.status < 300) return res({ path, url: sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl });
       let m = x.responseText; try { const j = JSON.parse(m); m = j.message || j.error || m; } catch {}
-      rej(new Error(`(${x.status}) ${m}`));
+      rej(new Error(x.status === 413 || /exceeded|too large/i.test(m) ? "حجم الملف أكبر من الحد المسموح في Supabase. استخدم خيار «رابط» (ارفع الملف على Google Drive مثلًا)، أو ارفع الحد من Supabase ← Storage ← Settings." : `(${x.status}) ${m}`));
     };
     x.onerror = () => rej(new Error("فشل الاتصال أثناء الرفع، تحقق من الإنترنت"));
     x.ontimeout = () => rej(new Error("انتهت مهلة الرفع"));
@@ -377,7 +438,7 @@ function openForm(b) {
   if (b) { $("title").value = b.title; $("author").value = b.author || ""; $("category").value = b.category || ""; $("desc").value = b.description || ""; }
   $("formTitle").textContent = b ? "تعديل: " + b.title : "إضافة كتاب";
   $("addBtn").textContent = b ? "حفظ التعديلات" : "إضافة";
-  $("hint").classList.toggle("hide", !b); $("msg").className = "err"; $("msg").textContent = "";
+  $("hint").classList.toggle("hide", !b); $("notifyBox").classList.toggle("hide", !!b); $("msg").className = "err"; $("msg").textContent = "";
   srcMode("file", "file"); srcMode("cover", "file"); dlg.showModal();
 }
 const editBook = id => openForm(books.find(x => x.id === id));
@@ -409,8 +470,9 @@ async function saveBook() {
       if (old?.cover_path) await sb.storage.from(BUCKET).remove([old.cover_path]);
     }
     $("msg").textContent = "جارٍ حفظ بيانات الكتاب...";
-    const { error } = old ? await sb.from("books").update(row).eq("id", old.id) : await sb.from("books").insert(row);
+    const { data: saved, error } = old ? await sb.from("books").update(row).eq("id", old.id).select().single() : await sb.from("books").insert(row).select().single();
     if (error) throw error;
+    if (!old && $("notify").checked) await sb.from("notifications").insert({ title: "كتاب جديد: " + row.title, body: row.author ? "للمؤلف " + row.author : "تمت إضافة كتاب جديد للمكتبة", kind: "book", link: "book:" + saved.id, created_by: me.id });
     dlg.close(); toast("تم الحفظ ✅"); load();
   } catch (e) { $("msg").className = "err"; $("msg").textContent = "خطأ: " + e.message; }
   $("addBtn").disabled = false; $("addBtn").textContent = old ? "حفظ التعديلات" : "إضافة";
@@ -423,6 +485,85 @@ async function delBook(id) {
   await sb.from("books").delete().eq("id", id);
   toast("تم الحذف"); load();
 }
+/* ---------- البانرات ---------- */
+let editingBn = null;
+const toLocal = iso => { if (!iso) return ""; const d = new Date(iso); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); };
+const okLink = l => !l || l.startsWith("book:") || !!safeUrl(l);
+function drawBanners() {
+  $("bnRows").innerHTML = banners.map(b => {
+    const sch = (b.starts_at || b.ends_at) ? `<br><span class="mut">${b.starts_at ? "من " + fmtD(b.starts_at) : ""} ${b.ends_at ? "إلى " + fmtD(b.ends_at) : ""}</span>` : "";
+    return `<tr><td>${safeUrl(b.image_url) ? `<img class="th" style="width:96px;height:54px" src="${esc(safeUrl(b.image_url))}" alt="">` : `<div class="ph th-${esc(b.theme || "teal")}" style="width:96px;height:54px;color:#fff">🎬</div>`}</td>
+    <td><b>${esc(b.title)}</b><br><span class="mut">${esc(b.subtitle)}</span>${sch}</td><td>${b.sort}</td><td>${b.clicks}</td>
+    <td><button class="s ${b.active ? "" : "g"}" onclick="toggleBn('${b.id}')">${b.active ? "مفعّل" : "متوقف"}</button></td>
+    <td style="white-space:nowrap"><button class="s g" onclick="openBn('${b.id}')">تعديل</button> <button class="d" onclick="delBn('${b.id}')">حذف</button></td></tr>`;
+  }).join("") || '<tr><td colspan="6" class="mut">لا توجد بانرات. أضف أول بانر ✨</td></tr>';
+}
+function openBn(id) {
+  const b = id ? banners.find(x => x.id === id) : null; editingBn = b ? b.id : null;
+  $("bnT").value = b?.title || ""; $("bnS").value = b?.subtitle || ""; $("bnTheme").value = b?.theme || "teal"; $("bnSort").value = b?.sort ?? 0;
+  $("bnLT").value = b?.link_text || ""; $("bnL").value = b?.link_url || ""; $("bnImg").value = ""; $("bnImgL").value = "";
+  $("bnSt").value = toLocal(b?.starts_at); $("bnEn").value = toLocal(b?.ends_at); $("bnAct").checked = b ? b.active : true;
+  $("bnTitle").textContent = b ? "تعديل البانر" : "إضافة بانر"; $("hintB").classList.toggle("hide", !b); $("bnMsg").textContent = "";
+  dBn.showModal();
+}
+async function saveBn() {
+  const title = $("bnT").value.trim(); if (!title) return $("bnMsg").textContent = "أدخل العنوان";
+  const link = $("bnL").value.trim(); if (!okLink(link)) return $("bnMsg").textContent = "الرابط يجب أن يبدأ بـ https:// أو book:";
+  const old = editingBn ? banners.find(x => x.id === editingBn) : null;
+  const row = { title, subtitle: $("bnS").value.trim(), theme: $("bnTheme").value, sort: +$("bnSort").value || 0, link_text: $("bnLT").value.trim(), link_url: link,
+    active: $("bnAct").checked, starts_at: $("bnSt").value ? new Date($("bnSt").value).toISOString() : null, ends_at: $("bnEn").value ? new Date($("bnEn").value).toISOString() : null };
+  $("bnBtn").disabled = true; $("bnMsg").className = "mut"; $("bnMsg").textContent = "جارٍ الحفظ...";
+  try {
+    const f = $("bnImg").files[0], l = $("bnImgL").value.trim();
+    if (f) { const u = await upload(f, "banners", "الصورة"); row.image_url = u.url; row.image_path = u.path; if (old?.image_path) await sb.storage.from(BUCKET).remove([old.image_path]); }
+    else if (l) { if (!safeUrl(l)) throw new Error("رابط الصورة غير صالح"); row.image_url = l; row.image_path = null; if (old?.image_path) await sb.storage.from(BUCKET).remove([old.image_path]); }
+    const { error } = old ? await sb.from("banners").update(row).eq("id", old.id) : await sb.from("banners").insert(row);
+    if (error) throw error;
+    dBn.close(); toast("تم حفظ البانر ✅"); load();
+  } catch (e) { $("bnMsg").className = "err"; $("bnMsg").textContent = "خطأ: " + e.message; }
+  $("bnBtn").disabled = false;
+}
+async function toggleBn(id) {
+  const b = banners.find(x => x.id === id);
+  const { error } = await sb.from("banners").update({ active: !b.active }).eq("id", id);
+  toast(error ? error.message : b.active ? "تم إيقاف البانر" : "تم تفعيل البانر"); load();
+}
+async function delBn(id) {
+  if (!confirm("حذف هذا البانر؟")) return;
+  const b = banners.find(x => x.id === id);
+  if (b.image_path) await sb.storage.from(BUCKET).remove([b.image_path]);
+  await sb.from("banners").delete().eq("id", id); toast("تم الحذف"); load();
+}
+
+/* ---------- الإشعارات ---------- */
+const nIcon = { info: "ℹ️", success: "✅", warning: "⚠️", book: "📚" };
+function drawNotifs() {
+  $("ntRows").innerHTML = notifs.map(n => {
+    const rd = reads.filter(r => r.notification_id === n.id).length, tot = n.user_id ? 1 : ps.length;
+    return `<tr><td>${nIcon[n.kind] || "🔔"} <b>${esc(n.title)}</b>${n.body ? `<br><span class="mut">${esc(n.body)}</span>` : ""}</td>
+    <td>${n.user_id ? esc(uname(n.user_id)) : '<span class="pill">الجميع</span>'}</td><td class="mut">${fmtDT(n.created_at)}</td>
+    <td>${rd} / ${tot}</td><td><button class="d" onclick="delNt('${n.id}')">حذف</button></td></tr>`;
+  }).join("") || '<tr><td colspan="5" class="mut">لم تُرسل إشعارات بعد.</td></tr>';
+}
+function openNt() {
+  ["ntT","ntB","ntL"].forEach(i => $(i).value = ""); $("ntK").value = "info"; $("ntMsg").textContent = "";
+  $("ntU").innerHTML = '<option value="all">الجميع</option>' + ps.map(p => `<option value="${p.id}">${esc(p.full_name || p.email)}</option>`).join("");
+  dNt.showModal();
+}
+async function saveNt() {
+  const title = $("ntT").value.trim(); if (!title) return $("ntMsg").textContent = "أدخل العنوان";
+  const link = $("ntL").value.trim(); if (!okLink(link)) return $("ntMsg").textContent = "الرابط يجب أن يبدأ بـ https:// أو book:";
+  $("ntBtn").disabled = true;
+  const { error } = await sb.from("notifications").insert({ title, body: $("ntB").value.trim(), kind: $("ntK").value, link: link || null, user_id: $("ntU").value === "all" ? null : $("ntU").value, created_by: me.id });
+  $("ntBtn").disabled = false;
+  if (error) { $("ntMsg").className = "err"; return $("ntMsg").textContent = "خطأ: " + error.message; }
+  dNt.close(); toast("تم إرسال الإشعار ✅"); load();
+}
+async function delNt(id) {
+  if (!confirm("حذف هذا الإشعار؟ سيختفي من عند الجميع.")) return;
+  await sb.from("notifications").delete().eq("id", id); toast("تم الحذف"); load();
+}
+
 load();
 </script>
 </body>

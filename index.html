@@ -108,6 +108,62 @@ dialog::backdrop{background:rgba(5,15,18,.55);backdrop-filter:blur(3px)}
 .acts{display:flex;gap:10px;flex-wrap:wrap}
 .menu{display:flex;align-items:center;gap:8px;cursor:pointer;background:transparent;color:var(--ink);padding:4px 6px 4px 12px;border-radius:30px;border:1px solid var(--line)}
 .menu:hover{background:var(--soft);transform:none}
+
+/* ---- البانرات ---- */
+.bnr{position:relative;border-radius:24px;overflow:hidden;margin-bottom:22px;height:270px;box-shadow:var(--shadow);user-select:none;touch-action:pan-y}
+.bsl{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .8s,visibility .8s;display:flex;align-items:center;padding:0 64px;color:#fff;overflow:hidden}
+.bsl.on{opacity:1;visibility:visible}
+.th-teal{background:linear-gradient(120deg,#0b3b3b,#1c7a6e)}.th-gold{background:linear-gradient(120deg,#6b410a,#d49a3a)}
+.th-purple{background:linear-gradient(120deg,#2e1065,#7c3aed)}.th-rose{background:linear-gradient(120deg,#7f1d3a,#e0405a)}
+.th-blue{background:linear-gradient(120deg,#0c2d6b,#2f7de1)}
+.bimg{position:absolute;inset:0;background-size:cover;background-position:center;transform:scale(1.04)}
+.bsl.on .bimg{animation:kb 9s ease-out forwards}
+@keyframes kb{to{transform:scale(1.18)}}
+.bov{position:absolute;inset:0;background:linear-gradient(270deg,rgba(0,0,0,.7),rgba(0,0,0,.1))}
+.bdeco i{position:absolute;border-radius:50%;background:rgba(255,255,255,.12);animation:fl 7s ease-in-out infinite}
+.bdeco i:nth-child(1){width:260px;height:260px;left:-60px;top:-80px}
+.bdeco i:nth-child(2){width:150px;height:150px;left:22%;bottom:-60px;animation-delay:-2s;background:rgba(255,255,255,.08)}
+.bdeco i:nth-child(3){width:90px;height:90px;left:40%;top:18%;animation-delay:-4s}
+@keyframes fl{50%{transform:translateY(-22px) scale(1.06)}}
+.btx{position:relative;max-width:580px}
+.btx h2{font-size:36px;margin:0 0 6px;line-height:1.35;text-shadow:0 2px 12px rgba(0,0,0,.25)}
+.btx p{margin:0;font-size:17px;opacity:.92}
+.btx>*{opacity:0;transform:translateY(20px)}
+.bsl.on .btx>*{animation:up .7s forwards}
+.bsl.on .btx>*:nth-child(2){animation-delay:.15s}.bsl.on .btx>*:nth-child(3){animation-delay:.3s}
+@keyframes up{to{opacity:1;transform:none}}
+.bbtn{background:#fff;color:#0f5c5c;margin-top:16px;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.bbtn:hover{background:#fff;transform:translateY(-2px) scale(1.03)}
+.bnav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;padding:0;background:rgba(255,255,255,.2);color:#fff;font-size:20px;backdrop-filter:blur(4px);z-index:3}
+.bnav:hover{background:rgba(255,255,255,.4);transform:translateY(-50%)}
+.bnav.r{right:14px}.bnav.l{left:14px}
+.dots{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:3}
+.dots button{width:9px;height:9px;padding:0;border-radius:50%;background:rgba(255,255,255,.45);transition:.3s}
+.dots button.on{width:28px;border-radius:6px;background:#fff}
+.dots button:hover{transform:none;background:#fff}
+.bprog{position:absolute;bottom:0;left:0;right:0;height:4px;background:rgba(255,255,255,.15);z-index:3}
+.bprog i{display:block;height:100%;width:0;background:var(--gold)}
+.bprog i.run{animation:pg 6s linear forwards}
+.bnr:hover .bprog i{animation-play-state:paused}
+@keyframes pg{to{width:100%}}
+@media(max-width:700px){.bnr{height:210px}.bsl{padding:0 22px}.btx h2{font-size:22px}.btx p{font-size:14px}.bnav{display:none}}
+/* ---- الإشعارات ---- */
+.bell{position:relative;background:transparent;color:var(--ink);border:1px solid var(--line);width:42px;height:42px;padding:0;border-radius:50%;font-size:18px}
+.bell:hover{background:var(--soft);transform:none}
+.bell.ring{animation:ring .8s}
+@keyframes ring{20%{transform:rotate(18deg)}40%{transform:rotate(-16deg)}60%{transform:rotate(10deg)}80%{transform:rotate(-6deg)}}
+.badge{position:absolute;top:-4px;left:-4px;min-width:20px;height:20px;border-radius:10px;background:#e0405a;color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 5px}
+.npanel{position:fixed;top:66px;left:max(12px,calc(50% - 590px));width:min(380px,calc(100vw - 24px));max-height:70vh;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.35);z-index:50;display:flex;flex-direction:column;overflow:hidden;animation:up .25s}
+.nph{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
+.nph b{font-size:16px}
+.npl{overflow:auto}
+.ni{display:flex;gap:12px;padding:13px 16px;border-bottom:1px solid var(--line);cursor:pointer;position:relative}
+.ni:hover{background:var(--soft)}
+.ni.un{background:color-mix(in srgb,var(--pri) 8%,transparent)}
+.ni.un:after{content:"";position:absolute;left:14px;top:18px;width:9px;height:9px;border-radius:50%;background:#e0405a}
+.ni .ic{width:38px;height:38px;border-radius:12px;background:var(--soft);display:grid;place-items:center;flex:none}
+.ni h4{margin:0;font-size:14px}.ni p{margin:2px 0;font-size:13px;color:var(--mut)}
+.ni time{font-size:11px;color:var(--mut)}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 22px;border-radius:30px;font-weight:700;z-index:99;opacity:0;pointer-events:none;transition:.25s}
 #toast.show{opacity:1}
 @media(max-width:600px){.det{grid-template-columns:1fr}.det .cover{max-width:180px;margin:auto}.hero h1{font-size:24px}}
@@ -199,11 +255,13 @@ const avatarHtml = u => u?.user_metadata?.avatar_url
     <a class="brand" href="index.html"><span class="logo">📚</span> المكتبة الرقمية</a>
     <div class="nav">
       <a id="adminLink" class="hide" href="admin.html">⚙️ لوحة التحكم</a>
+      <button class="bell" id="bell" onclick="toggleNotif(event)" title="الإشعارات">🔔<span id="nbadge" class="badge hide">0</span></button>
       <button class="menu" onclick="openAccount()"><span id="uname" style="font-size:14px"></span><span id="av"></span></button>
       <button class="g s" onclick="logout()">خروج</button>
     </div>
   </div></header>
   <main class="wrap">
+    <div id="bnr" class="bnr hide"></div>
     <section class="hero">
       <h1>ماذا تريد أن تقرأ اليوم؟</h1>
       <p><span id="cnt">0</span> كتاب وملف متاح للتصفح</p>
@@ -239,6 +297,7 @@ const avatarHtml = u => u?.user_metadata?.avatar_url
     <p id="accMsg" class="mut" style="margin-top:12px"></p>
   </div></dialog>
 
+<div id="npanel" class="npanel hide"><div class="nph"><b>🔔 الإشعارات</b><button class="g s" onclick="markAll()">تعليم الكل كمقروء</button></div><div id="npl" class="npl"></div></div>
 <div id="toast"></div>
 <footer>جميع الحقوق محفوظة © للمطور <b>محمد رمضان الحرباوي</b></footer>
 
@@ -332,10 +391,11 @@ async function init() {
   $("libView").classList.toggle("hide", !user);
   if (!user) { const e = store.get("lib_email"); if (e) { $("email").value = e; $("rem").checked = true; } return; }
 
-  const [p, b, f] = await Promise.all([
+  const [p, b, f, bnr] = await Promise.all([
     sb.from("profiles").select("*").eq("id", user.id).single(),
     sb.from("books").select("*").order("created_at", { ascending: false }),
-    sb.from("favorites").select("book_id").eq("user_id", user.id)
+    sb.from("favorites").select("book_id").eq("user_id", user.id),
+    sb.from("banners").select("*").order("sort").order("created_at", { ascending: false })
   ]);
   profile = p.data || {}; books = b.data || []; favs = new Set((f.data || []).map(x => x.book_id));
   sb.rpc("touch_seen");
@@ -344,6 +404,92 @@ async function init() {
   $("adminLink").classList.toggle("hide", profile.role !== "admin");
   $("cnt").textContent = books.length;
   renderChips(); render();
+  bn = bnr.data || []; renderBanners();
+  loadNotifs(); subscribeNotifs();
+}
+
+/* ---------- البانرات ---------- */
+let bn = [], bi = 0, btimer = null, tx0 = null;
+function goLink(l) {
+  if (!l) return;
+  if (l.startsWith("book:")) { const id = l.slice(5); if (books.some(b => b.id === id)) showBook(id); else toast("الكتاب غير متاح"); }
+  else if (safeUrl(l)) window.open(l, "_blank", "noopener");
+}
+function renderBanners() {
+  const el = $("bnr"); clearInterval(btimer);
+  if (!bn.length) return el.classList.add("hide");
+  el.classList.remove("hide"); bi = 0;
+  el.innerHTML = bn.map((b, i) => `<div class="bsl th-${esc(b.theme || "teal")} ${i === 0 ? "on" : ""}">
+      ${safeUrl(b.image_url) ? `<div class="bimg" data-img="${esc(safeUrl(b.image_url))}"></div><div class="bov"></div>` : '<div class="bdeco"><i></i><i></i><i></i></div>'}
+      <div class="btx"><h2>${esc(b.title)}</h2>${b.subtitle ? `<p>${esc(b.subtitle)}</p>` : "<span></span>"}
+      ${b.link_url && b.link_text ? `<div><button class="bbtn" data-b="${b.id}">${esc(b.link_text)}</button></div>` : ""}</div></div>`).join("")
+    + (bn.length > 1 ? `<button class="bnav r" data-d="-1">›</button><button class="bnav l" data-d="1">‹</button>
+      <div class="dots">${bn.map((_, i) => `<button data-g="${i}" class="${i === 0 ? "on" : ""}"></button>`).join("")}</div>
+      <div class="bprog"><i id="bpi"></i></div>` : "");
+  el.querySelectorAll(".bimg").forEach(d => d.style.backgroundImage = "url(" + JSON.stringify(d.dataset.img) + ")");
+  startBn();
+}
+function goBn(i) {
+  const sl = $("bnr").querySelectorAll(".bsl"); if (!sl.length) return;
+  bi = (i + sl.length) % sl.length;
+  sl.forEach((x, k) => x.classList.toggle("on", k === bi));
+  $("bnr").querySelectorAll(".dots button").forEach((x, k) => x.classList.toggle("on", k === bi));
+  startBn();
+}
+function startBn() {
+  clearInterval(btimer); const p = $("bpi");
+  if (p) { p.classList.remove("run"); void p.offsetWidth; p.classList.add("run"); }
+  if (bn.length > 1) btimer = setInterval(() => goBn(bi + 1), 6000);
+}
+$("bnr").addEventListener("click", e => {
+  const n = e.target.closest("[data-d]"), g = e.target.closest("[data-g]"), b = e.target.closest("[data-b]");
+  if (n) goBn(bi + +n.dataset.d);
+  else if (g) goBn(+g.dataset.g);
+  else if (b) { const x = bn.find(y => y.id === b.dataset.b); sb.rpc("track_banner", { bid: x.id }); goLink(x.link_url); }
+});
+$("bnr").addEventListener("touchstart", e => { tx0 = e.touches[0].clientX; }, { passive: true });
+$("bnr").addEventListener("touchend", e => { if (tx0 === null) return; const d = e.changedTouches[0].clientX - tx0; tx0 = null; if (Math.abs(d) > 50) goBn(bi + (d < 0 ? 1 : -1)); });
+
+/* ---------- الإشعارات ---------- */
+let notifs = [], readSet = new Set(), chan = null;
+const nIcon = { info: "ℹ️", success: "✅", warning: "⚠️", book: "📚" };
+const ago = d => { const m = Math.round((Date.now() - new Date(d)) / 6e4); return m < 1 ? "الآن" : m < 60 ? `منذ ${m} د` : m < 1440 ? `منذ ${Math.round(m / 60)} س` : fmtDate(d); };
+async function loadNotifs() {
+  const [n, r] = await Promise.all([
+    sb.from("notifications").select("*").gte("created_at", profile.created_at || user.created_at)
+      .or(`user_id.is.null,user_id.eq.${user.id}`).order("created_at", { ascending: false }).limit(50),
+    sb.from("notification_reads").select("notification_id").eq("user_id", user.id)
+  ]);
+  notifs = n.data || []; readSet = new Set((r.data || []).map(x => x.notification_id)); drawNotifs();
+}
+function drawNotifs() {
+  const un = notifs.filter(n => !readSet.has(n.id)).length;
+  $("nbadge").textContent = un > 9 ? "9+" : un; $("nbadge").classList.toggle("hide", !un);
+  $("npl").innerHTML = notifs.map(n => `<div class="ni ${readSet.has(n.id) ? "" : "un"}" data-n="${n.id}">
+    <div class="ic">${nIcon[n.kind] || "🔔"}</div><div><h4>${esc(n.title)}</h4>${n.body ? `<p>${esc(n.body)}</p>` : ""}<time>${ago(n.created_at)}</time></div></div>`).join("")
+    || '<div class="empty" style="padding:36px 0"><div style="font-size:40px">🔕</div>لا توجد إشعارات</div>';
+}
+$("npl").addEventListener("click", async e => {
+  const el = e.target.closest("[data-n]"); if (!el) return;
+  const n = notifs.find(x => x.id === el.dataset.n);
+  if (!readSet.has(n.id)) { readSet.add(n.id); drawNotifs(); sb.from("notification_reads").upsert({ user_id: user.id, notification_id: n.id }); }
+  if (n.link) { $("npanel").classList.add("hide"); goLink(n.link); }
+});
+async function markAll() {
+  const ids = notifs.filter(n => !readSet.has(n.id)).map(n => n.id); if (!ids.length) return;
+  ids.forEach(i => readSet.add(i)); drawNotifs();
+  await sb.from("notification_reads").upsert(ids.map(i => ({ user_id: user.id, notification_id: i })));
+}
+function toggleNotif(e) { e.stopPropagation(); $("npanel").classList.toggle("hide"); }
+document.addEventListener("click", e => { if (!e.target.closest("#npanel")) $("npanel").classList.add("hide"); });
+function subscribeNotifs() {
+  if (chan) return;
+  chan = sb.channel("notifs-" + user.id).on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications" }, p => {
+    const n = p.new; if (n.user_id && n.user_id !== user.id) return;
+    if (notifs.some(x => x.id === n.id)) return;
+    notifs.unshift(n); drawNotifs(); toast("🔔 " + n.title);
+    $("bell").classList.remove("ring"); void $("bell").offsetWidth; $("bell").classList.add("ring");
+  }).subscribe();
 }
 
 /* ---------- العرض ---------- */
@@ -446,7 +592,7 @@ async function changePass() {
 
 sb.auth.onAuthStateChange(ev => {
   if (ev === "PASSWORD_RECOVERY") { recovering = true; $("authView").classList.remove("hide"); $("libView").classList.add("hide"); showAuth("pReset"); }
-  else if (ev === "SIGNED_IN" || ev === "SIGNED_OUT") setTimeout(() => { if (ev === "SIGNED_OUT") { started = null; books = []; } init(); }, 0);
+  else if (ev === "SIGNED_IN" || ev === "SIGNED_OUT") setTimeout(() => { if (ev === "SIGNED_OUT") { started = null; books = []; if (chan) { sb.removeChannel(chan); chan = null; } } init(); }, 0);
 });
 init();
 </script>
